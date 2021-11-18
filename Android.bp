@@ -1,0 +1,47 @@
+cc_library_shared {
+
+    name: "libdvbcallsocket",
+    vendor: true,
+
+    srcs: ["dvbcallsocket.cpp"],
+
+    cflags: [
+        "-DANDROID",
+        "-DAMLINUX",
+        "-DLOG_LEVEL=1",
+    ],
+
+    arch: {
+        arm: {
+            instruction_set: "arm",
+        },
+    },
+    include_dirs: [
+        "vendor/amlogic/common/external/dvb/include/am_adp",
+        "vendor/amlogic/common/external/dvb/include/am_mw",
+        "vendor/amlogic/common/external/dvb/include/am_ver",
+        "vendor/amlogic/common/external/dvb/android/ndk/include",
+        "common/include/linux/amlogic",
+        "vendor/amlogic/common/frameworks/services/systemcontrol/PQ/include",
+        "vendor/amlogic/common/frameworks/services",
+        "frameworks/native/libs/binder/include",
+        "hardware/amlogic/media/amcodec/include",
+    ],
+
+    shared_libs: [
+        "libam_adp",
+        "libutils",
+        "libcutils",
+        "liblog",
+        "libdl",
+        "libc",
+        "vendor.amlogic.hardware.systemcontrol@1.0",
+        "vendor.amlogic.hardware.systemcontrol@1.1",
+        "libsystemcontrolservice",
+    ],
+
+    proprietary: true,
+
+    //LOCAL_32_BIT_ONLY := true
+
+}

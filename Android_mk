@@ -1,0 +1,65 @@
+LOCAL_PATH := $(call my-dir)
+
+DVB_PATH := $(wildcard external/dvb)
+ifeq ($(DVB_PATH), )
+     DVB_PATH := $(wildcard $(BOARD_AML_VENDOR_PATH)/external/dvb)
+endif
+ifeq ($(DVB_PATH), )
+     DVB_PATH := $(wildcard $(BOARD_AML_VENDOR_PATH)/dvb)
+endif
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := libdvbcallsocket
+LOCAL_VENDOR_MODULE := true
+LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := dvbcallsocket.cpp
+
+LOCAL_CFLAGS+=-DANDROID -DAMLINUX -DLOG_LEVEL=1
+#LOCAL_CFLAGS+=-std=gnu99
+
+LOCAL_ARM_MODE := arm
+LOCAL_C_INCLUDES := $(DVB_PATH)/include/am_adp\
+                    $(DVB_PATH)/include/am_mw\
+                    $(DVB_PATH)/include/am_ver \
+                    $(DVB_PATH)/android/ndk/include\
+                    common/include/linux/amlogic \
+                    $(wildcard $(BOARD_AML_VENDOR_PATH)frameworks/services/systemcontrol/PQ/include) \
+                    $(wildcard $(BOARD_AML_VENDOR_PATH)frameworks/services) \
+                    frameworks/native/libs/binder/include
+
+ifeq ($(wildcard hardware/amlogic/media),hardware/amlogic/media)
+$(info "have hardware/amlogic/media")
+AML_DEC_PATH := $(wildcard hardware/amlogic/media)
+LOCAL_C_INCLUDES += \
+  $(AML_DEC_PATH)/amadec/include \
+  $(AML_DEC_PATH)/amcodec/include
+else
+AML_DEC_PATH := $(wildcard $(BOARD_AML_VENDOR_PATH)/frameworks/av/LibPlayer)
+LOCAL_C_INCLUDES += \
+  $(AML_DEC_PATH)/amadec/include \
+  $(AML_DEC_PATH)/amcodec/include \
+  $(AML_DEC_PATH)/amffmpeg \
+  $(AML_DEC_PATH)/amplayer
+endif
+
+LOCAL_SHARED_LIBRARIES+= libam_adp \
+                         libutils \
+                         libcutils \
+                         liblog \
+                         libdl \
+                         libc \
+                         vendor.amlogic.hardware.systemcontrol@1.0 \
+                         vendor.amlogic.hardware.systemcontrol@1.1 \
+                         libsystemcontrolservice
+
+LOCAL_PRELINK_MODULE := false
+
+ifeq ($(BOARD_COMPILE_IN_SYSTEM), true)
+    LOCAL_PROPRIETARY_MODULE := false
+else
+    LOCAL_PROPRIETARY_MODULE := true
+endif
+
+#LOCAL_32_BIT_ONLY := true
+
+include $(BUILD_SHARED_LIBRARY)
